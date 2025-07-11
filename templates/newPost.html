@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='style/newPost.css')}}">
+    {{ ckeditor.load() }}  {# Loads the JS/CSS #}
+    {{ ckeditor.config() }}  {# Applies default toolbar #}
+    <title>Document</title>
+</head>
+<body>
+    <form action="{{url_for('insert',userId=id)}}" method="post">
+        <label for="title">Title</label>
+        <input type="text" name="title">
+        {{ form.hidden_tag() }}
+        {{ form.content.label }}<br>
+        {{ form.content() }}<br><br>
+        {{ form.submit() }}
+    </form>
+</body>
+</html>

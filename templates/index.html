@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='style/style.css') }}">
 </head>
 <body>
+    <form action="{{url_for('insert',userId=id)}}">
+        <button type="submit">New Post</button>
+    </form>
     {% for blog in blogs %}
         <h2>{{blog.title}}</h2>
         <p>{{blog.date}}</p>
