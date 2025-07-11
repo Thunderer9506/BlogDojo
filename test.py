@@ -14,62 +14,59 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
-    blog_posts = [
+    users = [
         {
-            "blogid": 1,
-            "title": "Why I Started Blogging as a Developer",
-            "content": "Sharing my journey as a dev has helped me learn faster and connect with others.",
-            "userId": 1  # Aarav Mehta
+            "name": "Aarav Mehta",
+            "username": "aaravm",
+            "email": "aarav.mehta@example.com",
+            "password": "test1234",
+            "blog_ids": [1, 3]
         },
         {
-            "blogid": 2,
-            "title": "5 Python Tricks That Will Save You Hours",
-            "content": "These Python tips helped me write cleaner, faster code—especially during crunch time.",
-            "userId": 2  # Sara Verma
+            "name": "Sara Verma",
+            "username": "sverma",
+            "email": "sara.verma@example.com",
+            "password": "securepass",
+            "blog_ids": [2]
         },
         {
-            "blogid": 3,
-            "title": "Debugging is a Superpower",
-            "content": "Here’s how I approach bugs: treat them like puzzles, not problems.",
-            "userId": 1  # Aarav Mehta
+            "name": "Dev Joshi",
+            "username": "devj",
+            "email": "dev.joshi@example.com",
+            "password": "myblogpass",
+            "blog_ids": [4, 6, 7]
         },
         {
-            "blogid": 4,
-            "title": "Learning Flask From Scratch",
-            "content": "I documented my Flask journey here so others can learn from my mistakes.",
-            "userId": 3  # Dev Joshi
+            "name": "Nisha Kapoor",
+            "username": "nkapoor",
+            "email": "nisha.kapoor@example.com",
+            "password": "hello123",
+            "blog_ids": []
         },
         {
-            "blogid": 5,
-            "title": "How I Stay Productive as a Remote Dev",
-            "content": "Simple routines, good music, and lots of tea keep me on track.",
-            "userId": 5  # Rohit Sen
-        },
-        {
-            "blogid": 6,
-            "title": "What I Learned From My First Open Source PR",
-            "content": "It was terrifying, exciting, and incredibly rewarding. Here’s what I learned.",
-            "userId": 3  # Dev Joshi
-        },
-        {
-            "blogid": 7,
-            "title": "SQLAlchemy for Beginners",
-            "content": "Understanding the ORM layer made databases feel much less scary.",
-            "userId": 3  # Dev Joshi
+            "name": "Rohit Sen",
+            "username": "rohits",
+            "email": "rohit.sen@example.com",
+            "password": "admin321",
+            "blog_ids": [5]
         }
     ]
 
-
     try:
-        for blog in blog_posts:
-
-            temp = Post(
-                title = blog["title"],
-                content = blog["content"],
-                userId = blog["userId"],
-            )
-            db.session.add(temp)
-            db.session.commit()
+        pass
+        # for user in users:
+        #     print(user['name'],
+        #         user['username'],
+        #         user['email'],
+        #         user['password'],
+        #         user['blog_ids'])
+        #     temp = User(name = user['name'],
+        #                 username = user['username'],
+        #                 email = user['email'],
+        #                 password = user['password'],
+        #                 blogId = json.dumps(user['blog_ids']))
+        #     db.session.add(temp)
+        #     db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
         print(e._message())
