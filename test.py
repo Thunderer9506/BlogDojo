@@ -53,7 +53,11 @@ with app.app_context():
     ]
 
     try:
-        pass
+        post = Post(blogId=4,title="Learning Flask From Scratch",
+                                    content = "I documented my Flask journey here so others can learn from my mistakes.",
+                                    userId = 3)
+        db.session.add(post)
+        db.session.commit()
         # for user in users:
         #     print(user['name'],
         #         user['username'],

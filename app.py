@@ -21,9 +21,9 @@ class PostForm(FlaskForm):
     content = CKEditorField('Content')
     submit = SubmitField('Post')
 
-@app.route('/1')
-def home():
-    user = User.query.filter_by(userId = 1).first()
+@app.route('/<int:id>')
+def home(id):
+    user = User.query.filter_by(userId = id).first()
     blogs = []
     for i in json.loads(user.blogId):
         temp = Post.query.filter_by(blogId=i).first()
@@ -37,12 +37,37 @@ def insert(userId):
     form = PostForm()
     if request.method == 'POST':
         title = request.form.get('title')
-        content = bleach.clean(request.form.get('content'))
+        content = request.form.get('content')
         # You can now store this in a database or print
         print(f"Title: {title}, Content: {content}")
-        
+
     
     return render_template('newPost.html',id=userId,form=form)
+
+@app.route('/delete/<int:blogId>')
+def deletePost(blogId):
+    post = Post.query.filter_by(blogId=blogId).first()
+    user = User.query.filter_by(userId=post.userId).first()
+    userPosts = json.loads(user.blogId)
+    userPosts.remove(blogId)
+    user.blogId = json.dumps(userPosts)
+    db.session.delete(post)
+    db.session.commit()
+
+    return redirect(url_for('home',id=post.userId))
+
+@app.route('/edit/<int:blogId>',methods=['GET','POST'])
+def editPost(blogId):
+    post = Post.query.filter_by(blogId=blogId).first()
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        post.title = title
+        post.content = content
+        db.session.commit()
+        return redirect(url_for('home',id=post.userId))
+    
+    return render_template('edit.html',post=post)
 
 # create the table
 with app.app_context():

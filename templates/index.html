@@ -14,6 +14,8 @@
         <h2>{{blog.title}}</h2>
         <p>{{blog.date}}</p>
         <p>{{blog.content}}</p>
+        <a href="{{url_for('deletePost',blogId=blog.blogId)}}">Delete</a>
+        <a href="{{url_for('editPost',blogId=blog.blogId)}}">Edit</a>
         <br>
     {% endfor %}
 </body>
