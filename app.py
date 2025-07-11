@@ -69,6 +69,12 @@ def editPost(blogId):
     
     return render_template('edit.html',post=post)
 
+@app.route('/view/<int:blogId>')
+def viewPost(blogId):
+    post = Post.query.filter_by(blogId=blogId).first()
+    user = User.query.filter_by(userId=post.userId).first()
+    return render_template('post.html',post = post,user = user.name)
+
 # create the table
 with app.app_context():
     db.create_all()

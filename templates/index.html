@@ -11,12 +11,12 @@
         <button type="submit">New Post</button>
     </form>
     {% for blog in blogs %}
-        <h2>{{blog.title}}</h2>
-        <p>{{blog.date}}</p>
-        <p>{{blog.content}}</p>
-        <a href="{{url_for('deletePost',blogId=blog.blogId)}}">Delete</a>
-        <a href="{{url_for('editPost',blogId=blog.blogId)}}">Edit</a>
-        <br>
+    <h2>{{blog.title}}</h2>
+    <p>{{blog.date}}</p>
+    <p>{{blog.content}}</p>
+    <a href="{{url_for('deletePost',blogId=blog.blogId)}}">Delete</a>
+    <a href="{{url_for('editPost',blogId=blog.blogId)}}">Edit</a>
+    <a href="{{url_for('viewPost',blogId=blog.blogId)}}">View</a>
     {% endfor %}
 </body>
 </html>
