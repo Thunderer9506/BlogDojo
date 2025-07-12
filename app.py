@@ -21,6 +21,11 @@ class PostForm(FlaskForm):
     content = CKEditorField('Content')
     submit = SubmitField('Post')
 
+
+@app.route("/")
+def login():
+    return render_template('login.html')
+
 @app.route('/<int:id>')
 def home(id):
     user = User.query.filter_by(userId = id).first()

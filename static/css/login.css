@@ -1,0 +1,15 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #18181b;
+    width: 100vw;
+    height: 100vh;
+}
+
+.loginCard{
+    height: 2rem;
+    width: 2rem;
+    border: 2px solid #D4D4D8;
+    border-radius: 10px;
+}
