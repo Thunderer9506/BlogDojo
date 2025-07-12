@@ -1,15 +1,154 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway';
+    background-color: #09090b;
+    color: #f4f4f5;
+    font-family: Mulish;
+}
+
 .container{
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #18181b;
-    width: 100vw;
+    width: auto;
+    margin: 0 1rem;
     height: 100vh;
+    text-align: center;
 }
 
 .loginCard{
-    height: 2rem;
-    width: 2rem;
     border: 2px solid #D4D4D8;
+    border-radius: 20px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.loginCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.loginHeading{
+    font-family: Raleway;
+    font-weight: bold;
+    font-size: 2rem;
+    margin: 1rem 0rem;
+}
+
+.loginParagraph{
+    font-weight: 200;
+    font-size: 1rem;
+    text-align: center;
+}
+.loginParagraph a{
+    text-decoration: none;
+    color: #2B7FFF;
+}
+
+.loginError{
+    font-weight: 200;
+    font-size: 14px;
+    margin: 1rem 0rem;
+    color: #fb2c36;
+    display: none;
+}
+
+.loginForm{
+    width: 90%;
+    text-align: left;
+    margin: 1rem 0rem;
+}
+
+.loginLabel{
+    margin-bottom: 8px;
+}
+
+.loginInput{
+    padding: 0px 10px;
+    width: 97%;
     border-radius: 10px;
+    border: 1px solid #71717B;
+    background-color: #050303;
+    color: #f4f4f5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: border 0.3s ease;
+}
+.loginInput input{
+    font-family: Mulish;
+    color: #f4f4f5;
+    background-color: inherit;
+    border: 0;
+    outline: 0;
+    width: inherit;
+    padding: 10px;
+    font-size: 17px;
+    font-weight: 100;
+}
+
+
+/* Change border color on hover */
+.loginInput:hover {
+    border: 1px solid #f4f4f5;
+}
+
+/* Change border color when input field inside is focused */
+.loginInput input:focus {
+    border: none; /* avoid double borders */
+    outline: none;
+}
+
+.loginInput:has(input:focus) {
+    border: 1px solid #f4f4f5;
+}
+
+
+.icon{
+    font-size: 1.2rem;
+}
+
+.labelInput{
+    margin: 1rem 0rem;
+}
+
+.loginButton{
+    padding: 6px 0px;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    background-color: #2B7FFF;
+    font-family: Raleway;
+    font-weight: bold;
+    font-size: 24px;
+    color: #f4f4f5;
+    margin: 14px 0px;
+    cursor: pointer;
+}
+.loginButton:hover{
+    background-color: #51a2ff;
+}
+
+@media (max-width: 480px) {
+    .loginHeading {
+        font-size: 1.5rem;
+    }
+
+    .loginParagraph,
+    .loginError {
+        font-size: 0.9rem;
+    }
+
+    .loginButton {
+        font-size: 20px;
+        padding: 10px;
+    }
+
+    .loginInput input {
+        font-size: 15px;
+    }
 }
