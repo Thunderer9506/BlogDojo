@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="container">
-        <form class="insertForm" method="POST">
+        <form enctype="multipart/form-data" action="{{url_for('insert',userId=userId)}}" class="insertForm" method="POST">
             <div class="inputLabelWraper">
                 <label class="insertLabel" for="image">Image:</label>
                 <input class="insertImage" type="file" name="image">

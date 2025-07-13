@@ -1,26 +1,23 @@
 from flask import *
-from flask_ckeditor import CKEditor, CKEditorField
 from sqlalchemy.exc import *
-import bleach
-from flask_wtf import FlaskForm
-from wtforms import SubmitField
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+
 from db import db
 from models.user import User
 from models.post import Post
-from utils import idGenerator
+from utils import pfp
+
 import json
+import uuid
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['CKEDITOR_PKG_TYPE'] = 'full'
+
 app.secret_key = 'secret'
 db.init_app(app)
-ckeditor = CKEditor(app)
-
-class PostForm(FlaskForm):
-    content = CKEditorField('Content')
-    submit = SubmitField('Post')
 
 @app.route('/')
 def initialRoute():
@@ -34,13 +31,16 @@ def signup():
             username = request.form.get('username')
             email = request.form.get('email')
             password = request.form.get('password')
-            user = User(name=name, username=username, email=email, password=password)
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+            userId = str(uuid.uuid4())
+            user = User(userId=userId,name=name, username=username, email=email, password=hashed_password,
+                        profile_pic=pfp.generate_random_pfp(userId))
             db.session.add(user)
             db.session.commit()
             session['user_id'] = user.userId
             session['user_email'] = user.email
             session['user_password'] = user.password
-            return redirect(url_for('home',id=user.userId))  # PRG pattern
+            return redirect(url_for('home',userId=user.userId))  # PRG pattern
         except IntegrityError as e:
             print(e)
             db.session.rollback()
@@ -48,48 +48,53 @@ def signup():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if 'user_id' in session:
-        return redirect(url_for('home',id=session['user_id']))
-    else:
-        if request.method == 'POST':
-            try:
-                email = request.form.get('email')
-                password = request.form.get('password')
-                user = User.query.filter_by(email=email, password=password).first()
-                session['user_id'] = user.userId
-                session['user_email'] = user.email
-                session['user_password'] = user.password
-                if user:
-                    return redirect(url_for('home', id=user.userId))
-                else:
-                    return render_template('login.html', error="Invalid login")
-            except:
-                return redirect(url_for('login', error="Something went bad"))
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.userId
+            session['user_email'] = user.email
+            return redirect(url_for('home', userId=user.userId))
+        else:
+            # 🔥 Redirecting with error message in URL
+            return render_template('login.html', error='Credentials are invalid')
+
+    # ✅ Extract the error if present from query parameters
+    # error = request.args.get('error')
     return render_template('login.html')
 
 
-@app.route('/<int:userId>')
+
+@app.route('/<string:userId>')
 def home(userId):
-    user = User.query.filter_by(userId = userId).first()
-    blogs = []
-    for i in json.loads(user.blogId):
-        temp = Post.query.filter_by(blogId=i).first()
-        blogs.append(temp)
     
-    return render_template('index.html',blogs = blogs,id=user.userId)
+    return redirect(url_for('insert',userId = userId))
 
+@app.route('/image/<string:post_id>')
+def get_post_image(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.image_data:
+        return Response(post.image_data, mimetype=post.image_mime)
+    else:
+        return "No image", 404
 
-@app.route('/<int:userId>/insert',methods=['GET','POST'])
+@app.route('/insert/<string:userId>',methods=['GET','POST'])
 def insert(userId):
-    form = PostForm()
     if request.method == 'POST':
+        image = request.files['image']
+        image_data = image.read()            # Read image bytes
+        image_mime = image.content_type      # Store content-type
         title = request.form.get('title')
         content = request.form.get('content')
-        # You can now store this in a database or print
-        print(f"Title: {title}, Content: {content}")
-
-    
-    return render_template('newPost.html',id=userId,form=form)
+        postId = str(uuid.uuid4())
+        post = Post(blogId = postId,title=title,content=content,userId = userId,image_data=image_data,
+                    image_mime=image_mime)
+        db.session.add(post)    
+        db.session.commit()
+        return render_template('userPost.html',post=post)
+    return render_template('newPost.html',userId=userId)
 
 @app.route('/delete/<int:blogId>')
 def deletePost(blogId):
