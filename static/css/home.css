@@ -1,0 +1,23 @@
+.navbar{
+    display: flex;
+    justify-content:end;
+    margin: 1rem 3rem;
+}
+.navItem{
+    display: flex;
+    gap: 2rem;
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerWidth{
+    width: 80vw;
+}
+
+.heading{
+    font-size: 96px;
+}

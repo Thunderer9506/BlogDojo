@@ -1,22 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='style/style.css') }}">
-</head>
-<body>
-    <form action="{{url_for('insert',userId=id)}}">
-        <button type="submit">New Post</button>
-    </form>
-    {% for blog in blogs %}
-    <h2>{{blog.title}}</h2>
-    <p>{{blog.date}}</p>
-    <p>{{blog.content}}</p>
-    <a href="{{url_for('deletePost',blogId=blog.blogId)}}">Delete</a>
-    <a href="{{url_for('editPost',blogId=blog.blogId)}}">Edit</a>
-    <a href="{{url_for('viewPost',blogId=blog.blogId)}}">View</a>
-    {% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+{% import "macros/modeButton.html" as modeButton %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
+{% endblock %}
+
+{% block content %}
+
+    <nav class="navbar">
+        <div class="navItem">
+            {{modeButton.navButton('','fa-solid fa-pen','')}}
+            {{modeButton.navButton('','fa-solid fa-user','')}}
+            {{modeButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="containerWidth">
+            <h1 class="heading">BLOG</h1>
+            <div class="allPost">
+                
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}

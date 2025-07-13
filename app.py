@@ -69,8 +69,8 @@ def login():
 
 @app.route('/<string:userId>')
 def home(userId):
-    
-    return redirect(url_for('insert',userId = userId))
+    post = Post.query.all()
+    return render_template('index.html',post=post)
 
 @app.route('/image/<string:post_id>')
 def get_post_image(post_id):
