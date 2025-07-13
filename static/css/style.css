@@ -13,6 +13,7 @@ body{
     background-color: var(--black);
     color: var(--white);
     font-family: Mulish;
+    transition: all 0.3s;
 }
 
 * {
@@ -29,4 +30,24 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+}
+
+/* Macros Styling */
+
+.macroButton{
+    height: 3rem;
+    width: 3rem;
+    border: 2px solid var(--white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: transparent;
+    transition: all 0.3s;
+}
+
+.macroButton i{
+    font-size: 1.5rem;
+    color: var(--white);
 }
