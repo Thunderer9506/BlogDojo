@@ -5,6 +5,7 @@ from models.post import Post
 from utils.idGenerator import Password
 from sqlalchemy.exc import SQLAlchemyError
 import json
+import uuid
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Blog.db'  # use same or different DB
@@ -53,11 +54,12 @@ with app.app_context():
     ]
 
     try:
-        post = Post(blogId=4,title="Learning Flask From Scratch",
-                                    content = "I documented my Flask journey here so others can learn from my mistakes.",
-                                    userId = 3)
-        db.session.add(post)
-        db.session.commit()
+        # post = Post(blogId=4,title="Learning Flask From Scratch",
+        #                             content = "I documented my Flask journey here so others can learn from my mistakes.",
+        #                             userId = 3)
+        # db.session.add(post)
+        # db.session.commit()
+        print(str(uuid.uuid4()))
         # for user in users:
         #     print(user['name'],
         #         user['username'],
