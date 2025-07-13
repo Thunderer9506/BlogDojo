@@ -14,10 +14,6 @@
 
   {% block content %}{% endblock %}
 
-  <script src="{{url_for('static',filename='js/index.js')}}">
-    document.getElementsByTagName('form').addEventListener('submit',(e)=>{
-    e.preventDefault()
-})
-  </script>
+  <script src="{{url_for('static',filename='js/index.js')}}"></script>
 </body>
 </html>
