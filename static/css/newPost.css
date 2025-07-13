@@ -1,3 +1,89 @@
-input{
-    display: block;
+.container{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.insertForm{
+    width: 70%;
+    font-family: Raleway;
+}
+
+.inputLabelWraper{
+    margin: 2rem 0rem;
+    width: inherit;
+}
+
+.insertLabel{
+    font-size: 1.5rem;
+    
+    margin-bottom: 10px;
+}
+
+.insertInput{
+    margin-left: 1rem;
+    display: inline;
+    padding:5px;
+    font-family: Mulish;
+    border-radius: 5px;
+    border: 1px solid #71717B;
+    transition: border 0.3s ease;
+    color: #f4f4f5;
+    background-color: transparent;
+    outline: 0;
+    width: inherit;
+    font-size: 17px;
+    font-weight: 100;
+}
+
+/* Change border color on hover */
+.insertInput:hover {
+    border: 1px solid #f4f4f5;
+}
+
+/* Change border color when input field inside is focused */
+.insertInput input:focus {
+    border: none; /* avoid double borders */
+    outline: none;
+}
+
+.insertInput:has(input:focus) {
+    border: 1px solid #f4f4f5;
+}
+
+.insertImage::file-selector-button{
+    /* button sizing & shape */
+  height: 5rem;
+  width: 5rem;
+  border-radius: 10px;
+  border: 1px solid #71717B;
+  background-color: #f4f4f5;
+  color: transparent;
+
+  background-image: url("data:image/svg+xml;utf8,\<svg xmlns='http://www.w3.org/2000/svg' color='black' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='size-6'><path stroke-linecap='round' stroke-linejoin='round' d='M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5' /></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 3rem 3rem;
+
+}
+.insertImage::file-selector-button:hover{
+    background-color: #71717B;
+}
+
+.insertButton{
+    padding: 6px 0px;
+    width: 10rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #2B7FFF;
+    font-family: Raleway;
+    font-weight: bold;
+    font-size: 24px;
+    color: #f4f4f5;
+    margin: 2rem 0rem;
+    cursor: pointer;
+}
+.insertButton:hover{
+    background-color: #51a2ff;
 }

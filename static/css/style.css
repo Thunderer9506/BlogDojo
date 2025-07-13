@@ -2,9 +2,18 @@
 
 :root{
     --black: #09090b;
-    --white: #f4f4f5
+    --white: #f4f4f5;
+    --border: #71717B;
 }
 
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway';
+    background-color: var(--black);
+    color: var(--white);
+    font-family: Mulish;
+}
 
 * {
     margin: 0;
