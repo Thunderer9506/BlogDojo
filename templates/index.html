@@ -19,7 +19,10 @@
         <div class="containerWidth">
             <h1 class="heading">BLOG</h1>
             <div class="allPost">
-                
+                <div class="postCard">
+                    <img class="postImage" src="{{url_for('get_post_image', post_id=post.blogId)}}" alt="{{post.title}}">
+
+                </div>
             </div>
         </div>
     </div>
