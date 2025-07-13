@@ -1,5 +1,6 @@
-from flask import Flask,render_template,redirect,url_for,request
+from flask import *
 from flask_ckeditor import CKEditor, CKEditorField
+from sqlalchemy.exc import *
 import bleach
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
@@ -21,14 +22,55 @@ class PostForm(FlaskForm):
     content = CKEditorField('Content')
     submit = SubmitField('Post')
 
+@app.route('/')
+def initialRoute():
+    return redirect(url_for('login'))
 
-@app.route("/")
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        try:
+            name = request.form.get('name')
+            username = request.form.get('username')
+            email = request.form.get('email')
+            password = request.form.get('password')
+            user = User(name=name, username=username, email=email, password=password)
+            db.session.add(user)
+            db.session.commit()
+            session['user_id'] = user.userId
+            session['user_email'] = user.email
+            session['user_password'] = user.password
+            return redirect(url_for('home',id=user.userId))  # PRG pattern
+        except IntegrityError as e:
+            print(e)
+            db.session.rollback()
+    return render_template('signup.html')
+
+@app.route("/login", methods=['GET', 'POST'])
 def login():
+    if 'user_id' in session:
+        return redirect(url_for('home',id=session['user_id']))
+    else:
+        if request.method == 'POST':
+            try:
+                email = request.form.get('email')
+                password = request.form.get('password')
+                user = User.query.filter_by(email=email, password=password).first()
+                session['user_id'] = user.userId
+                session['user_email'] = user.email
+                session['user_password'] = user.password
+                if user:
+                    return redirect(url_for('home', id=user.userId))
+                else:
+                    return render_template('login.html', error="Invalid login")
+            except:
+                return redirect(url_for('login', error="Something went bad"))
     return render_template('login.html')
 
-@app.route('/<int:id>')
-def home(id):
-    user = User.query.filter_by(userId = id).first()
+
+@app.route('/<int:userId>')
+def home(userId):
+    user = User.query.filter_by(userId = userId).first()
     blogs = []
     for i in json.loads(user.blogId):
         temp = Post.query.filter_by(blogId=i).first()

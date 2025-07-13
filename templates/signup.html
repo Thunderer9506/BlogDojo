@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/login.css')}}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="loginCard">
+            <h3 class="loginHeading">Sign Up</h3>
+            <p class="loginParagraph">Enter your personal data to create your account</p>
+            {% if error %}
+                <p class="loginError">{{ error }}</p>
+            {% endif %}
+            <form class="signupForm" action="{{ url_for('signup') }}" method="POST">
+                <div class="labelInput">
+                    <label class="loginLabel" for="name">Name</label>
+                    <div class="loginInput">
+                        <i class="icon fa-regular fa-user"></i>
+                        <input type="text" name="name">
+                    </div>
+                </div>
+                <div class="labelInput">
+                    <label class="loginLabel" for="username">Username</label>
+                    <div class="loginInput">
+                        <i class="icon fa-regular fa-circle-user"></i>
+                        <input type="text" name="username">
+                    </div>
+                </div>
+                <div class="labelInput">
+                    <label class="loginLabel" for="email">Email</label>
+                    <div class="loginInput">
+                        <i class="icon fa-regular fa-envelope"></i>
+                        <input type="email" name="email">
+                    </div>
+                </div>
+                <div class="labelInput">
+                    <label class="loginLabel" for="password">Password</label>
+                    <div class="loginInput">
+                        <i class="icon fa-solid fa-lock"></i>
+                        <input type="text" name="password">
+                    </div>
+                </div>
+                <button class="loginButton" type="submit">Sign Up</button>
+            </form>
+            <p class="loginQuestion">Already have an account? <a href="{{url_for('login')}}" class="tologin">Log In</a></p>
+
+        </div>
+    </div>
+{% endblock %}

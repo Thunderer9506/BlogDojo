@@ -8,43 +8,30 @@
 {% block content %}
     <div class="container">
         <div class="loginCard">
-            <h3 class="loginHeading">Sign Up</h3>
-            <p class="loginParagraph">Enter your personal data to create your account</p>
-            <p class="loginError">Enter your Email Correctly</p>
-            <form class="loginForm" action="" method="post">
-                <div class="labelInput">
-                    <label class="loginLabel" for="name">Name</label>
-                    <div class="loginInput">
-                        <i class="icon fa-regular fa-user"></i>
-                        <input class="" type="text" name="name">
-                    </div>
-                </div>
-                <div class="labelInput">
-                    <label class="loginLabel" for="username">Username</label>
-                    <div class="loginInput">
-                        <i class="icon fa-regular fa-circle-user"></i>
-                        <input class="" type="text" name="username">
-                    </div>
-                </div>
+            <h3 class="loginHeading">Log In</h3>
+            <p class="loginParagraph">Enter your Email and Password</p>
+            {% if error %}
+                <p class="loginError">{{ error }}</p>
+            {% endif %}
+
+            <form class="loginForm" action="{{ url_for('login') }}" method="POST">
                 <div class="labelInput">
                     <label class="loginLabel" for="email">Email</label>
                     <div class="loginInput">
                         <i class="icon fa-regular fa-envelope"></i>
-                        <input class="" type="text" name="email">
+                        <input type="email" name="email">
                     </div>
                 </div>
                 <div class="labelInput">
                     <label class="loginLabel" for="password">Password</label>
                     <div class="loginInput">
                         <i class="icon fa-solid fa-lock"></i>
-                        <input class="" type="text" name="password">
+                        <input type="text" name="password">
                     </div>
                 </div>
-                <button class="loginButton" type="submit">Sign Up</button>
-                <p class="loginParagraph">Already have an account? <a href="http://">Log In</a></p>
+                <button class="loginButton" type="submit">Log In</button>
             </form>
-    
-
+            <p class="loginQuestion">Does'nt have an account? <a href="{{url_for('signup')}}" class="tologin">Sign Up</a></p>
 
         </div>
     </div>
