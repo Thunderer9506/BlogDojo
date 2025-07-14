@@ -1,19 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{url_for('static',filename='style/newPost.css')}}">
-    <title>Document</title>
-</head>
-<body>
-    <a href="{{url_for('home',id=post.userId)}}">back</a>
-    <form action="{{url_for('editPost',blogId=post.blogId)}}" method="post">
-        <label for="title">Title</label>
-        <input type="text" name="title" value="{{post.title}}"><br>
-        <label for="content">content</label><br>
-        <textarea name="content">{{post.content}}</textarea><br><br>
-        <button type="submit">submit</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+{% import "macros/navButton.html" as navButton %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/newPost.css')}}">
+{% endblock %}
+
+{% block content %}
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; left:1rem;">
+            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+        </div>
+    </div>
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; right:1rem;">
+            {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+        </div>
+    </div>
+
+    <div class="container">
+        <form enctype="multipart/form-data" action="{{url_for('editPost',blogId=post.blogId)}}" class="insertForm" method="POST">
+            <div class="inputLabelWraper">
+                <label class="insertLabel" for="image">Image:</label>
+                {% if post %}
+                    <img src="{{ url_for('get_post_image', post_id=post.blogId) }}" alt="Current Image" style="max-width: 200px; margin-bottom: 10px;">
+                {% endif %}
+
+            </div>
+            <div class="inputLabelWraper">
+                <label class="insertLabel" for="title" style="display: inline;">Title:</label>
+                <input class="insertInput" type="text" name="title" value="{{post.title}}">
+            </div>
+            
+            <label class="insertLabel" for="content">Content:</label>
+            <!-- This is where Quill will display -->
+            <div id="editor" style="height: 20rem;"></div>
+            
+            <!-- Hidden input to send HTML content to Flask -->
+            <input type="hidden" name="content" id="hidden-content">
+            
+            <button class="insertButton" type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            placeholder:'Write your Blog here...'
+        });
+
+        // Set initial content
+        quill.root.innerHTML = {{ post.content | tojson | safe }};
+        
+        // On form submit, move HTML into hidden input
+        document.querySelector('form').onsubmit = function () {
+            var content = document.querySelector('#hidden-content');
+            content.value = quill.root.innerHTML;
+        };
+    </script>
+
+
+{% endblock %}

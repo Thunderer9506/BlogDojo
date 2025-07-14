@@ -7,6 +7,8 @@ from db import db
 from models.user import User
 from models.post import Post
 from utils import pfp
+import bleach
+from functools import wraps
 
 import json
 import uuid
@@ -19,11 +21,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'secret'
 db.init_app(app)
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/')
+@login_required
 def initialRoute():
-    if session['user_id']:
-        return redirect(url_for('home',userId = session['user_id']))
-    return redirect(url_for('login'))
+    return redirect(url_for('login',userId = session['user_id']))
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -50,6 +60,8 @@ def signup():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    if 'user_id' in session:
+        return redirect(url_for('home',userId = session['user_id']))
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -69,13 +81,15 @@ def login():
 
 
 
-@app.route('/<string:userId>')
+@app.route('/<string:userId>/')
+@login_required
 def home(userId):
     post = Post.query.all()
     user = User.query.all()
     return render_template('index.html',posts=post,users=user,userId=userId)
 
 @app.route('/image/<string:post_id>')
+@login_required
 def get_post_image(post_id):
     post = Post.query.get_or_404(post_id)
     if post.image_data:
@@ -92,6 +106,7 @@ def get_post_image(post_id):
 #         return "No image", 404
 
 @app.route('/insert/<string:userId>',methods=['GET','POST'])
+@login_required
 def insert(userId):
     if request.method == 'POST':
         image = request.files['image']
@@ -108,26 +123,32 @@ def insert(userId):
     return render_template('newPost.html',userId=userId)
 
 @app.route('/user/<string:userId>')
+@login_required
 def profile(userId):
     user = User.query.filter_by(userId = userId).all()
     post = Post.query.filter_by(userId = userId).all()
 
-    return render_template('profile.html',user=user,posts=post)
+    return render_template('profile.html',user=user,posts=post,userId=userId)
 
+@app.route('/post/<string:blogId>')
+@login_required
+def viewPost(blogId):
+    post = Post.query.filter_by(blogId=blogId).first()
+    user = User.query.filter_by(userId=post.userId).first()
+    return render_template('post.html',post = post,user = user)
 
-@app.route('/delete/<int:blogId>')
+@app.route('/delete/<string:blogId>')
+@login_required
 def deletePost(blogId):
     post = Post.query.filter_by(blogId=blogId).first()
     user = User.query.filter_by(userId=post.userId).first()
-    userPosts = json.loads(user.blogId)
-    userPosts.remove(blogId)
-    user.blogId = json.dumps(userPosts)
     db.session.delete(post)
     db.session.commit()
 
-    return redirect(url_for('home',id=post.userId))
+    return redirect(url_for('profile',userId=user.userId))
 
-@app.route('/edit/<int:blogId>',methods=['GET','POST'])
+@app.route('/edit/<string:blogId>',methods=['GET','POST'])
+@login_required
 def editPost(blogId):
     post = Post.query.filter_by(blogId=blogId).first()
     if request.method == 'POST':
@@ -136,15 +157,10 @@ def editPost(blogId):
         post.title = title
         post.content = content
         db.session.commit()
-        return redirect(url_for('home',id=post.userId))
-    
+        return redirect(url_for('profile',userId=post.userId))
+        
     return render_template('edit.html',post=post)
 
-@app.route('/view/<int:blogId>')
-def viewPost(blogId):
-    post = Post.query.filter_by(blogId=blogId).first()
-    user = User.query.filter_by(userId=post.userId).first()
-    return render_template('post.html',post = post,user = user.name)
 
 @app.template_filter('sliceDate')
 def slice_date(s):
