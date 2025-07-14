@@ -14,9 +14,9 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="postLink">
+                <a class="postLink" href="{{url_for('viewPost',blogId=post.blogId)}}">
                     <i class="fa-solid fa-arrow-right fa-rotate-by" style="--fa-rotate-angle: -45deg;"></i>
-                </div>
+                </a>
             </div>
         {% endfor %}
     </div>
