@@ -120,6 +120,7 @@ input:-webkit-autofill:active{
     margin: .5rem;
     top: 0px;
     right: 0px;
+    cursor: pointer;
 }
 .postLink:hover{
     background-color: #d4d4d8;
