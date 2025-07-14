@@ -7,7 +7,14 @@
 
 {% block content %}
     <div style="position:relative;">
-        <div style="position:absolute; top:1rem; left:1rem;">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</div>
+        <div style="position:absolute; top:1rem; left:1rem;">
+            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+        </div>
+    </div>
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; right:1rem;">
+            {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+        </div>
     </div>
 
     <div class="container">
