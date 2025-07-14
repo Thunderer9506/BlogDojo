@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% import "macros/modeButton.html" as modeButton %}
+{% import "macros/navButton.html" as navButton %}
+{% import 'macros/blogCard.html' as blogCard %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
@@ -9,21 +10,17 @@
 
     <nav class="navbar">
         <div class="navItem">
-            {{modeButton.navButton('','fa-solid fa-pen','')}}
-            {{modeButton.navButton('','fa-solid fa-user','')}}
-            {{modeButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+            <a href="{{url_for('insert',userId = userId)}}">{{navButton.navButton('','fa-solid fa-pen','')}}</a>
+            
+            {{navButton.navButton('','fa-solid fa-user','')}}
+            {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
         </div>
     </nav>
 
     <div class="container">
         <div class="containerWidth">
-            <h1 class="heading">BLOG</h1>
-            <div class="allPost">
-                <div class="postCard">
-                    <img class="postImage" src="{{url_for('get_post_image', post_id=post.blogId)}}" alt="{{post.title}}">
-
-                </div>
-            </div>
+            <h1 class="heading">BLOGDOJO</h1>
+            {{blogCard.blogCard(posts,users)}}
         </div>
     </div>
     
