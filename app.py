@@ -1,24 +1,23 @@
 from flask import *
 from sqlalchemy.exc import *
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 
 from db import db
 from models.user import User
 from models.post import Post
 from utils import pfp
-import bleach
 from functools import wraps
 
-import json
 import uuid
+from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Blog.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+load_dotenv()
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv("SQLALCHEMY_TRACK_MODIFICATIONS")
 
-app.secret_key = 'secret'
+app.secret_key = os.getenv('SECRET_KEY')
 db.init_app(app)
 
 def login_required(f):
@@ -52,7 +51,7 @@ def signup():
             session['user_id'] = user.userId
             session['user_email'] = user.email
             session['user_password'] = user.password
-            return redirect(url_for('home',userId=user.userId))  # PRG pattern
+            return redirect(url_for('home',userId=user.userId))  
         except IntegrityError as e:
             print(e)
             db.session.rollback()
@@ -72,11 +71,9 @@ def login():
             session['user_email'] = user.email
             return redirect(url_for('home', userId=user.userId))
         else:
-            # 🔥 Redirecting with error message in URL
+            
             return render_template('login.html', error='Credentials are invalid')
-
-    # ✅ Extract the error if present from query parameters
-    # error = request.args.get('error')
+    
     return render_template('login.html')
 
 
@@ -97,21 +94,14 @@ def get_post_image(post_id):
     else:
         return "No image", 404
     
-# @app.route('/pfp/<string:userId>')
-# def get_pfp(userId):
-#     user = User.query.get_or_404(userId)
-#     if user.profile_pic:
-#         return Response(user.profile_pic)
-#     else:
-#         return "No image", 404
 
 @app.route('/insert/<string:userId>',methods=['GET','POST'])
 @login_required
 def insert(userId):
     if request.method == 'POST':
         image = request.files['image']
-        image_data = image.read()            # Read image bytes
-        image_mime = image.content_type      # Store content-type
+        image_data = image.read()            
+        image_mime = image.content_type      
         title = request.form.get('title')
         content = request.form.get('content')
         postId = str(uuid.uuid4())
@@ -166,6 +156,6 @@ def editPost(blogId):
 def slice_date(s):
     return s.strftime("%d-%m-%Y")
 
-# create the table
+
 with app.app_context():
     db.create_all()
