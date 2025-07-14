@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
+{% import "macros/navButton.html" as navButton %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{url_for('static',filename='css/newPost.css')}}">
 {% endblock %}
 
 {% block content %}
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; left:1rem;">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</div>
+    </div>
+
     <div class="container">
         <form enctype="multipart/form-data" action="{{url_for('insert',userId=userId)}}" class="insertForm" method="POST">
             <div class="inputLabelWraper">
