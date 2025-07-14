@@ -59,7 +59,7 @@ BlogDojo focuses on enhancing practical full-stack development skills using:
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/your-username/blogdojo.git
+git clone https://github.com/Thunderer9506/blogdojo.git
 cd blogdojo
 python -m venv venv
 source venv/bin/activate   # or venv\Scripts\activate on Windows
