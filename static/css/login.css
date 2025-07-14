@@ -15,13 +15,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
     /* width: 20rem; */
 }
 
 .loginCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .loginHeading{
@@ -63,8 +62,8 @@
     padding: 0px 10px;
     border-radius: 10px;
     border: 1px solid #71717B;
-    background-color: #050303;
-    color: #f4f4f5;
+    color: inherit;
+    background-color: transparent;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -72,8 +71,8 @@
 }
 .loginInput input{
     font-family: Mulish;
-    color: #f4f4f5;
     background-color: inherit;
+    color: inherit;
     border: 0;
     outline: 0;
     width: inherit;
@@ -85,7 +84,7 @@
 
 /* Change border color on hover */
 .loginInput:hover {
-    border: 1px solid #f4f4f5;
+    border: 2px solid #3f3f46;
 }
 
 /* Change border color when input field inside is focused */
@@ -95,7 +94,7 @@
 }
 
 .loginInput:has(input:focus) {
-    border: 1px solid #f4f4f5;
+    border: 2px solid #3f3f46;
 }
 
 
