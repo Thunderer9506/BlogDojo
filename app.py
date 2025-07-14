@@ -70,7 +70,8 @@ def login():
 @app.route('/<string:userId>')
 def home(userId):
     post = Post.query.all()
-    return render_template('index.html',post=post)
+    user = User.query.all()
+    return render_template('index.html',posts=post,users=user,userId=userId)
 
 @app.route('/image/<string:post_id>')
 def get_post_image(post_id):
@@ -79,6 +80,14 @@ def get_post_image(post_id):
         return Response(post.image_data, mimetype=post.image_mime)
     else:
         return "No image", 404
+    
+# @app.route('/pfp/<string:userId>')
+# def get_pfp(userId):
+#     user = User.query.get_or_404(userId)
+#     if user.profile_pic:
+#         return Response(user.profile_pic)
+#     else:
+#         return "No image", 404
 
 @app.route('/insert/<string:userId>',methods=['GET','POST'])
 def insert(userId):
@@ -126,6 +135,10 @@ def viewPost(blogId):
     post = Post.query.filter_by(blogId=blogId).first()
     user = User.query.filter_by(userId=post.userId).first()
     return render_template('post.html',post = post,user = user.name)
+
+@app.template_filter('sliceDate')
+def slice_date(s):
+    return s.strftime("%d-%m-%Y")
 
 # create the table
 with app.app_context():
