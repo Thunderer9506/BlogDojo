@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import "macros/navButton.html" as navButton %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{url_for('static',filename='css/login.css')}}">
@@ -6,6 +7,11 @@
 
 
 {% block content %}
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; right:1rem;">
+            {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+        </div>
+    </div>
     <div class="container">
         <div class="loginCard">
             <h3 class="loginHeading">Sign Up</h3>
