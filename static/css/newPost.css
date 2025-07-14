@@ -12,7 +12,7 @@
 
 .inputLabelWraper{
     margin: 2rem 0rem;
-    width: inherit;
+    width: 100%;
 }
 
 .insertLabel{
@@ -23,7 +23,7 @@
 
 .insertInput{
     margin-left: 1rem;
-    display: inline;
+    display: inline-block;
     padding:5px;
     font-family: Mulish;
     border-radius: 5px;
@@ -32,7 +32,7 @@
     color: #f4f4f5;
     background-color: transparent;
     outline: 0;
-    width: inherit;
+    width: 80%;
     font-size: 17px;
     font-weight: 100;
 }
@@ -86,4 +86,15 @@
 }
 .insertButton:hover{
     background-color: #51a2ff;
+}
+
+@media (max-width:640px) {
+    .insertForm{
+        margin-top: 8rem;
+        width: 90%;
+    }
+
+    .insertInput{
+        width: 50%;
+    }
 }

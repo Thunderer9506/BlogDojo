@@ -63,3 +63,29 @@
     margin-top: 2px;
     font-weight: 200;
 }
+
+@media (max-width:700px) {
+    .stats {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .stat-title {
+        font-size: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+    }
+    .username {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width:500px) {
+    .card {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+}

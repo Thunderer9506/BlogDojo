@@ -1,6 +1,6 @@
 .container{
     height: 100vh;
-    width: 99vw;
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -69,4 +69,34 @@
 .deleteButton{
     border: 1px solid #E81123;
     color: #E81123;
+}
+
+@media (max-width:900px) {
+    .container{
+        height: 100vh;
+        width: 100%;
+        display: block;
+        position: relative;
+    }
+
+    .blogImage{
+        position: absolute;
+        height: inherit;
+        width: 100%;
+    }
+
+    .blogInfo{
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        width: max-content;
+        margin: 10px;
+    }
+
+    .username{
+        color: var(--white);
+    }
+    .blogInfo h1{
+        color: var(--white);
+    }
 }
