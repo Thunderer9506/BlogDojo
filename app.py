@@ -21,6 +21,8 @@ db.init_app(app)
 
 @app.route('/')
 def initialRoute():
+    if session['user_id']:
+        return redirect(url_for('home',userId = session['user_id']))
     return redirect(url_for('login'))
 
 @app.route("/signup", methods=['GET', 'POST'])
@@ -104,6 +106,14 @@ def insert(userId):
         db.session.commit()
         return render_template('userPost.html',post=post)
     return render_template('newPost.html',userId=userId)
+
+@app.route('/user/<string:userId>')
+def profile(userId):
+    user = User.query.filter_by(userId = userId).all()
+    post = Post.query.filter_by(userId = userId).all()
+
+    return render_template('profile.html',user=user,posts=post)
+
 
 @app.route('/delete/<int:blogId>')
 def deletePost(blogId):

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% import "macros/navButton.html" as navButton %}
+{% import 'macros/blogCard.html' as blogCard %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/profile.css')}}">
+{% endblock %}
+
+{% block content %}
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; left:1rem;">
+            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+        </div>
+    </div>
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; right:1rem;">
+            {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="containerWidth">
+            <div class="card">
+                <div class="left-section">
+                    <img src="{{user[0].profile_pic}}"  alt="{{user[0].name}}" class="profile-img"/>
+                    <h2 class="name">{{user[0].name}}</h2>
+                </div>
+                <div class="info">
+                    <h3 class="username">{{user[0].username}}</h3>
+                    <div class="stats">
+                        <div>
+                            <span class="stat-title">Total Post</span>
+                            <span class="stat-value">{{posts | length}}</span>
+                        </div>
+                        <div>
+                            <span class="stat-title">Joined On</span>
+                            <span class="stat-value">{{user[0].date | sliceDate}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {{blogCard.blogCard(posts,user)}}
+            </div>
+        </div>
+    </div>
+{% endblock %}

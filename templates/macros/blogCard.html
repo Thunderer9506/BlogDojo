@@ -9,7 +9,7 @@
                         {% for user in users %}
                             {% if post.userId == user.userId %}
                                 <img class="pfp" src="{{user.profile_pic}}" alt="{{user.name}}">
-                                <p class="userInfo">{{user.username}} . {{post.date | sliceDate}}</p>
+                                <p>{{user.username}} . {{post.date | sliceDate}}</p>
                             {% endif %}
                         {% endfor %}
                     </div>
