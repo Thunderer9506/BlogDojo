@@ -25,6 +25,10 @@ input,label{
    display: block;
 }
 
+a{
+    all: unset;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
