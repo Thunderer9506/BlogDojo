@@ -12,7 +12,7 @@
         <div class="navItem">
             <a href="{{url_for('insert',userId = userId)}}">{{navButton.navButton('','fa-solid fa-pen','')}}</a>
             
-            {{navButton.navButton('','fa-solid fa-user','')}}
+            <a href="{{url_for('profile',userId = userId)}}">{{navButton.navButton('','fa-solid fa-user','')}}</a>
             {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
         </div>
     </nav>
