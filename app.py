@@ -109,7 +109,7 @@ def insert(userId):
                     image_mime=image_mime)
         db.session.add(post)    
         db.session.commit()
-        return render_template('userPost.html',post=post)
+        return redirect(url_for('home',userId=userId))
     return render_template('newPost.html',userId=userId)
 
 @app.route('/user/<string:userId>')
@@ -125,7 +125,7 @@ def profile(userId):
 def viewPost(blogId):
     post = Post.query.filter_by(blogId=blogId).first()
     user = User.query.filter_by(userId=post.userId).first()
-    return render_template('post.html',post = post,user = user)
+    return render_template('post.html',post = post,user = user,currentUser = session['user_id'])
 
 @app.route('/delete/<string:blogId>')
 @login_required
