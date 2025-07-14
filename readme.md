@@ -9,7 +9,7 @@ BlogDojo is a simple yet elegant blog web application built with **Flask** and *
 
 ## 🚀 Live Demo
 
-🔗 Coming Soon: [https://blogdojo.onrender.com](https://blogdojo.onrender.com)
+🔗 Live Website: [https://blogdojo.onrender.com](https://blogdojo.onrender.com)
 
 ---
 
@@ -49,7 +49,7 @@ BlogDojo focuses on enhancing practical full-stack development skills using:
 | Backend      | Python, Flask             |
 | Database     | SQLite + SQLAlchemy       |
 | Frontend     | HTML, CSS, JS, QuillJS    |
-| Auth         | Flask-WTF + Sessions      |
+| Auth         | werkzeug + Sessions       |
 | Deployment   | Render.com                |
 
 ---
@@ -82,9 +82,11 @@ Visit [http://localhost:5000](http://localhost:5000)
 
 Create a `.env` or set them in your OS/Render:
 
-| Variable      | Purpose              |
-|---------------|----------------------|
-| `SECRET_KEY`  | Session encryption   |
+| Variable                         | Purpose              |
+|----------------------------------|----------------------|
+| `SECRET_KEY`                     | Session encryption   |
+| `SQLALCHEMY_DATABASE_URI`        | Database Link/URI    |
+| `SQLALCHEMY_TRACK_MODIFICATIONS` | False                |
 
 ---
 
@@ -93,14 +95,17 @@ Create a `.env` or set them in your OS/Render:
 ```
 blogdojo/
 │
-├── app.py                  # Main Flask app
-├── db/                     # Database setup and models
-├── templates/              # Jinja2 HTML templates
-├── static/                 # CSS, JS, images
-├── macros/                 # Jinja2 macro templates
-├── utils.py                # Utility functions (ID generation, etc.)
-├── requirements.txt        # Python dependencies
-└── README.md               # You're here
+├── app.py                    # Main Flask app
+├── db.py                     # Database setup and models
+├── templates/                # Jinja2 HTML templates
+    |── macros/             
+├── static/                   # CSS, JS, images
+    |── css/
+    |── js/
+    |── images/                 
+├── utils/                    # Utility functions (ID generation, etc.)
+├── requirements.txt          # Python dependencies
+└── README.md                 # You're here
 ```
 
 ---
