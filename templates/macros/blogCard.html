@@ -1,0 +1,23 @@
+{% macro blogCard(posts,users) %}
+    <div class="allPost">
+        {% for post in posts %}
+            <div class="postCard">
+                <img class="postImage" src="{{url_for('get_post_image', post_id=post.blogId)}}" alt="{{post.title}}">
+                <div class="postInfo">
+                    <h3>{{post.title | title}}</h3>
+                    <div class="userDetails">
+                        {% for user in users %}
+                            {% if post.userId == user.userId %}
+                                <img class="pfp" src="{{user.profile_pic}}" alt="{{user.name}}">
+                                <p class="userInfo">{{user.username}} . {{post.date | sliceDate}}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="postLink">
+                    <i class="fa-solid fa-arrow-right fa-rotate-by" style="--fa-rotate-angle: -45deg;"></i>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}

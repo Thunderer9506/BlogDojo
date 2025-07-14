@@ -38,6 +38,7 @@ input:-webkit-autofill:active{
 
 /* Macros Styling */
 
+/* navbutton macro */
 .macroButton{
     height: 3rem;
     width: 3rem;
@@ -54,4 +55,72 @@ input:-webkit-autofill:active{
 .macroButton i{
     font-size: 1.5rem;
     color: var(--white);
+}
+
+/* blog card macro */
+
+.allPost{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap:1rem;
+    transition: all .3s;
+}
+
+.postImage{
+    width: auto;
+    height: 26rem;
+    border-radius: inherit;
+}
+
+.postCard{
+    position: relative;
+    color: white;
+    border-radius: 1rem;
+}
+
+.postInfo{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    padding: 1rem;
+}
+
+.postInfo h3{
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 1rem 0rem;
+}
+
+.pfp{
+    height: inherit;
+    width: auto;
+    background-color: white;
+    border-radius: 100%;
+    margin-right: 1rem;
+}
+
+.userDetails{
+    display: flex;
+    height: 2rem;
+    align-items: center;
+}
+
+.postLink{
+    position: absolute;
+    background-color: var(--white);
+    color: var(--black);
+    height: 2rem;
+    width: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    margin: .5rem;
+    top: 0px;
+    right: 0px;
+}
+.postLink:hover{
+    background-color: #d4d4d8;
 }
