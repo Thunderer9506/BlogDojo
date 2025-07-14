@@ -7,12 +7,12 @@
 
 {% block content %}
     <div style="position:relative;">
-        <div style="position:absolute; top:1rem; left:1rem;">
-            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+        <div style="position:absolute; top:1rem; left:1rem;z-index:1">
+            <a href="{{url_for('home',userId = user.userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
         </div>
     </div>
     <div style="position:relative;">
-        <div style="position:absolute; top:1rem; right:1rem;">
+        <div style="position:absolute; top:1rem; right:1rem;z-index:1">
             {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
         </div>
     </div>
@@ -27,8 +27,10 @@
                 <img class="userPfp" src="{{user.profile_pic}}" alt="{{user.name}}">
                 <p class="username">{{user.username}} . {{post.date | sliceDate}}</p>  
             </div>
-            <a href="{{url_for('editPost',blogId=post.blogId)}}"><button class="editButton" type="button">Edit</button></a>
-            <a href="{{url_for('deletePost',blogId=post.blogId)}}"><button class="deleteButton" type="button">Delete</button></a>
+            {% if user. userId == post.userId %}    
+                <a href="{{url_for('editPost',blogId=post.blogId)}}"><button class="editButton" type="button">Edit</button></a>
+                <a href="{{url_for('deletePost',blogId=post.blogId)}}"><button class="deleteButton" type="button">Delete</button></a>
+            {% endif %}
         </div>
     </div>
 
