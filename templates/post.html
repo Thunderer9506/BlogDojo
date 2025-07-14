@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% import "macros/navButton.html" as navButton %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/post.css')}}">
+{% endblock %}
+
+{% block content %}
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; left:1rem;">
+            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+        </div>
+    </div>
+    <div style="position:relative;">
+        <div style="position:absolute; top:1rem; right:1rem;">
+            {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="blogImage">
+            <img src="{{url_for('get_post_image', post_id=post.blogId)}}" alt="Blog Image" srcset="">
+        </div>
+        <div class="blogInfo">
+            <h1>{{post.title | title}}</h1>
+            <div class="blogData">
+                <img class="userPfp" src="{{user.profile_pic}}" alt="{{user.name}}">
+                <p class="username">{{user.username}} . {{post.date | sliceDate}}</p>  
+            </div>
+            <a href="{{url_for('editPost',blogId=post.blogId)}}"><button class="editButton" type="button">Edit</button></a>
+            <a href="{{url_for('deletePost',blogId=post.blogId)}}"><button class="deleteButton" type="button">Delete</button></a>
+        </div>
+    </div>
+
+    <div class="blogParagraph">
+        <p>{{post.content | safe}}</p>
+    </div>
+{% endblock %}
