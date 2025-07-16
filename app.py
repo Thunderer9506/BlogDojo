@@ -1,6 +1,7 @@
 from flask import *
 from sqlalchemy.exc import *
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_migrate import Migrate
 
 from db import db
 from models.user import User
@@ -19,6 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv("SQLALCHEMY_TRACK_MODIF
 
 app.secret_key = os.getenv('SECRET_KEY')
 db.init_app(app)
+migrate = Migrate(app, db)
 
 def login_required(f):
     @wraps(f)
