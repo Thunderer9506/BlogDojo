@@ -117,10 +117,10 @@ def insert(userId):
 @app.route('/user/<string:userId>')
 @login_required
 def profile(userId):
-    user = User.query.filter_by(userId = userId).all()
+    user = User.query.filter_by(userId = userId).first()
     post = Post.query.filter_by(userId = userId).all()
 
-    return render_template('profile.html',user=user,posts=post,userId=userId)
+    return render_template('profile.html',user=[user],posts=post,userId=userId)
 
 @app.route('/post/<string:blogId>')
 @login_required
