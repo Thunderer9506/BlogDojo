@@ -73,7 +73,6 @@ def login():
             session['user_email'] = user.email
             return redirect(url_for('home', userId=user.userId))
         else:
-            
             return render_template('login.html', error='Credentials are invalid')
     
     return render_template('login.html')
@@ -157,6 +156,9 @@ def editPost(blogId):
 @app.template_filter('sliceDate')
 def slice_date(s):
     return s.strftime("%d-%m-%Y")
+
+with app.app_context():
+    db.create_all()
 
 
 if __name__ == '__main__':
