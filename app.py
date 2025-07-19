@@ -51,7 +51,7 @@ def signup():
             session['user_id'] = user.userId
             session['user_email'] = user.email
             session['user_password'] = user.password
-            return redirect(url_for('home',userId=user.userId))  
+            return redirect(url_for('home',userId=session['user_id']))  
         except IntegrityError as e:
             print(e)
             db.session.rollback()
@@ -69,7 +69,7 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.userId
             session['user_email'] = user.email
-            return redirect(url_for('home', userId=user.userId))
+            return redirect(url_for('home', userId=session['user_id']))
         else:
             return render_template('login.html', error='Credentials are invalid')
     
@@ -82,7 +82,7 @@ def login():
 def home(userId):
     post = Post.query.all()
     user = User.query.all()
-    return render_template('index.html',posts=post,users=user,userId=userId)
+    return render_template('index.html',posts=post,users=user,userId=session['user_id'])
 
 @app.route('/image/<string:post_id>')
 @login_required
@@ -104,12 +104,12 @@ def insert(userId):
         title = request.form.get('title')
         content = request.form.get('content')
         postId = str(uuid.uuid4())
-        post = Post(blogId = postId,title=title,content=content,userId = userId,image_data=image_data,
+        post = Post(blogId = postId,title=title,content=content,userId = session['user_id'],image_data=image_data,
                     image_mime=image_mime)
         db.session.add(post)    
         db.session.commit()
-        return redirect(url_for('home',userId=userId))
-    return render_template('newPost.html',userId=userId)
+        return redirect(url_for('home',userId=session['user_id']))
+    return render_template('newPost.html',userId=session['user_id'])
 
 @app.route('/user/<string:userId>')
 @login_required
@@ -117,7 +117,7 @@ def profile(userId):
     user = User.query.filter_by(userId = userId).first()
     post = Post.query.filter_by(userId = userId).all()
 
-    return render_template('profile.html',user=[user],posts=post,userId=userId)
+    return render_template('profile.html',user=[user],posts=post,userId=session['user_id'])
 
 @app.route('/post/<string:blogId>')
 @login_required
@@ -130,11 +130,11 @@ def viewPost(blogId):
 @login_required
 def deletePost(blogId):
     post = Post.query.filter_by(blogId=blogId).first()
-    user = User.query.filter_by(userId=post.userId).first()
+    user = User.query.filter_by(userId=session['user_id']).first()
     db.session.delete(post)
     db.session.commit()
 
-    return redirect(url_for('profile',userId=user.userId))
+    return redirect(url_for('profile',userId=session['user_id']))
 
 @app.route('/edit/<string:blogId>',methods=['GET','POST'])
 @login_required
@@ -146,7 +146,7 @@ def editPost(blogId):
         post.title = title
         post.content = content
         db.session.commit()
-        return redirect(url_for('profile',userId=post.userId))
+        return redirect(url_for('profile',userId=session['user_id']))
         
     return render_template('edit.html',post=post)
 
