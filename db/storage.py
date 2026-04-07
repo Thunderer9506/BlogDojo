@@ -3,6 +3,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from typing import Dict, Optional, Any
 import os
+import json
 
 from dotenv import load_dotenv
 from imagekitio import ImageKit
@@ -52,8 +53,14 @@ class Database:
             self.image_storage = ImageStorage()
 
             # Get the path to the service account key relative to this script
-            service_account_path = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
-            cred = credentials.Certificate(service_account_path)
+            firebase_json_string = os.getenv("SERVICE_ACCOUNT_KEY_PATH")
+
+            if not firebase_json_string:
+                raise ValueError("No FIREBASE_CREDENTIALS found in environment variables")
+
+            # 2. Convert the string back into a Python dictionary
+            firebase_dict = json.loads(firebase_json_string)
+            cred = credentials.Certificate(firebase_dict)
             if not firebase_admin._apps:
                 firebase_admin.initialize_app(cred)
             self.db = firestore.client()
