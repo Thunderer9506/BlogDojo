@@ -72,7 +72,7 @@ def login():
         user = get_admin_credentials()
         stored_email = user.get('email')
         stored_password = user.get('password')
-        if user and email == stored_email and stored_password and password == stored_password:
+        if user and email == stored_email and check_password_hash(stored_password, password):
             session['is_admin'] = True
             return redirect(url_for('home'))
         return render_template('login.html', error='Credentials are invalid')
