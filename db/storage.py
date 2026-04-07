@@ -1,3 +1,5 @@
+import base64
+
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -55,17 +57,13 @@ class Database:
             # Get the service account key JSON from environment variable
             firebase_json_string = os.getenv("SERVICE_ACCOUNT_KEY_PATH")
 
-            if not firebase_json_string:
+            if firebase_json_string:
+                # Decode the base64 string back to standard JSON format
+                decoded_creds = base64.b64decode(firebase_json_string).decode('utf-8')
+                firebase_dict = json.loads(decoded_creds)
+            else:
                 raise ValueError("No SERVICE_ACCOUNT_KEY_PATH found in environment variables")
-
-            # Handle escaped JSON string (Render escapes newlines and quotes)
-            try:
-                firebase_dict = json.loads(firebase_json_string)
-            except json.JSONDecodeError:
-                # Unescape the string for Render environment
-                firebase_json_string = firebase_json_string
-                firebase_dict = json.loads(firebase_json_string)
-
+            
             cred = credentials.Certificate(firebase_dict)
             if not firebase_admin._apps:
                 firebase_admin.initialize_app(cred)
@@ -203,12 +201,12 @@ FAKE_BLOGS = [
 ]
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 #     print("\n" + "="*70)
 #     print("BLOG DATABASE OPERATIONS DEMO")
 #     print("="*70 + "\n")
     
-#     db = Database()
+    db = Database()
 #     created_ids: list[str] = []
     
 #     try:
