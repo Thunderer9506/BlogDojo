@@ -63,7 +63,7 @@ class Database:
                 firebase_dict = json.loads(firebase_json_string)
             except json.JSONDecodeError:
                 # Unescape the string for Render environment
-                firebase_json_string = firebase_json_string.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
+                firebase_json_string = firebase_json_string
                 firebase_dict = json.loads(firebase_json_string)
 
             cred = credentials.Certificate(firebase_dict)
