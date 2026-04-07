@@ -2,10 +2,15 @@ services:
   - type: web
     name: blogdojo
     env: python
+    region: oregon
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app  # Use gunicorn for production
+    startCommand: gunicorn app:app
     envVars:
-      - key: SQLALCHEMY_DATABASE_URI
-        fromDatabase:
-          name: blogdojo-postgres
-          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SERVICE_ACCOUNT_KEY_PATH
+        sync: false
+      - key: IMAGEKIT_PRIVATE_KEY
+        sync: false
+      - key: PORT
+        value: 5000
