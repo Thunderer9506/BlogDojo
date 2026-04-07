@@ -52,14 +52,20 @@ class Database:
             print("[DATABASE] Initializing Firebase connection...")
             self.image_storage = ImageStorage()
 
-            # Get the path to the service account key relative to this script
+            # Get the service account key JSON from environment variable
             firebase_json_string = os.getenv("SERVICE_ACCOUNT_KEY_PATH")
 
             if not firebase_json_string:
-                raise ValueError("No FIREBASE_CREDENTIALS found in environment variables")
+                raise ValueError("No SERVICE_ACCOUNT_KEY_PATH found in environment variables")
 
-            # 2. Convert the string back into a Python dictionary
-            firebase_dict = json.loads(firebase_json_string)
+            # Handle escaped JSON string (Render escapes newlines and quotes)
+            try:
+                firebase_dict = json.loads(firebase_json_string)
+            except json.JSONDecodeError:
+                # Unescape the string for Render environment
+                firebase_json_string = firebase_json_string.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
+                firebase_dict = json.loads(firebase_json_string)
+
             cred = credentials.Certificate(firebase_dict)
             if not firebase_admin._apps:
                 firebase_admin.initialize_app(cred)
