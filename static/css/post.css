@@ -47,7 +47,8 @@
 }
 
 .blogParagraph{
-    margin: 5rem 2rem;
+    margin: 5rem 10rem;
+    font-size: 1.5rem;
 }
 
 .editButton,.deleteButton{
