@@ -8,7 +8,7 @@
 {% block content %}
     <div style="position:relative;">
         <div style="position:absolute; top:1rem; left:1rem;">
-            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+            <a href="{{url_for('home')}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
         </div>
     </div>
     <div style="position:relative;">
@@ -19,6 +19,9 @@
 
     <div class="container">
         <form enctype="multipart/form-data" action="{{url_for('editPost',blogId=post.blogId)}}" class="insertForm" method="POST">
+            {% if error %}
+                <p class="loginError">{{ error }}</p>
+            {% endif %}
             <div class="inputLabelWraper">
                 <label class="insertLabel" for="image">Image:</label>
                 {% if post %}
