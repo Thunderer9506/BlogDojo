@@ -14,38 +14,27 @@ class ImageStorage:
     def __init__(self) -> None:
         """Initialize ImageKit client from environment variables."""
         load_dotenv()
-        self.public_key = os.getenv("IMAGEKIT_PUBLIC_KEY")
         self.private_key = os.getenv("IMAGEKIT_PRIVATE_KEY")
-        self.url_endpoint = os.getenv("IMAGEKIT_URL_ENDPOINT")
         self.client: Optional[ImageKit] = None
 
-        if self.public_key and self.private_key and self.url_endpoint:
+        if self.private_key:
             self.client = ImageKit(
-                public_key=self.public_key,
                 private_key=self.private_key,
-                url_endpoint=self.url_endpoint,
             )
             print("[IMAGEKIT] ✓ ImageKit initialized successfully")
         else:
             print("[IMAGEKIT] ImageKit keys are missing. Image upload is disabled.")
 
-    def upload_blog_image(self, image_path: str, blog_id: str) -> str:
+    def upload_blog_image(self, image_data: Any, blog_id: str) -> str:
         """Upload a blog image to ImageKit and return its URL."""
         if not self.client:
             raise ValueError("ImageKit client is not initialized")
 
-        if not isinstance(image_path, str) or not image_path.strip():
-            raise ValueError("image_path must be a non-empty string")
-
-        normalized_path = os.path.abspath(image_path)
-        if not os.path.exists(normalized_path):
-            raise FileNotFoundError(f"Image file not found: {normalized_path}")
-
-        print(f"[IMAGEKIT] Uploading image for blog '{blog_id}' from: {normalized_path}")
-        with open(normalized_path, "rb") as image_file:
-            response = self.client.upload_file(
-                file=image_file,
+        print(f"[IMAGEKIT] Uploading image for blog '{blog_id}'")
+        response = self.client.files.upload(
+                file=image_data,
                 file_name=f"blog_{blog_id}",
+                folder="/blog_images",
             )
 
         image_url = response.url
@@ -116,16 +105,16 @@ class Database:
             print(f"[ERROR] Failed to read blog '{blogId}': {e}")
             raise
     
-    def create(self, data: Dict[str, Any], image_path: Optional[str] = None) -> str:
+    def create(self, data: Dict[str, Any], image_data: Any) -> str:
         """ Create a new blog post in the database. """
         try:
             print(f"[CREATE] Creating new blog post: '{data['title']}'")
             update_time, doc_ref = self.db.collection("Blog").add(data)
             print(f"[CREATE] ✓ Blog post created successfully with ID: {doc_ref.id}")
 
-            if image_path:
+            if image_data:
                 try:
-                    image_url = self.image_storage.upload_blog_image(image_path=image_path, blog_id=doc_ref.id)
+                    image_url = self.image_storage.upload_blog_image(image_data=image_data, blog_id=doc_ref.id)
                     self.edit(doc_ref.id, {"image_url": image_url})
                     print(f"[CREATE] ✓ Image URL saved to blog '{doc_ref.id}'")
                 except Exception as image_error:
@@ -201,105 +190,105 @@ FAKE_BLOGS = [
 ]
 
 
-if __name__ == "__main__":
-    print("\n" + "="*70)
-    print("BLOG DATABASE OPERATIONS DEMO")
-    print("="*70 + "\n")
+# if __name__ == "__main__":
+#     print("\n" + "="*70)
+#     print("BLOG DATABASE OPERATIONS DEMO")
+#     print("="*70 + "\n")
     
-    db = Database()
-    created_ids: list[str] = []
+#     db = Database()
+#     created_ids: list[str] = []
     
-    try:
-        # ==================== CREATE OPERATIONS ====================
-        print("\n" + "-"*70)
-        print("1. CREATE OPERATIONS - Adding fake blog posts")
-        print("-"*70 + "\n")
+#     try:
+#         # ==================== CREATE OPERATIONS ====================
+#         print("\n" + "-"*70)
+#         print("1. CREATE OPERATIONS - Adding fake blog posts")
+#         print("-"*70 + "\n")
         
-        for blog_data in FAKE_BLOGS:
-            try:
-                blog_id = db.create(blog_data)
-                created_ids.append(blog_id)
-            except Exception as e:
-                print(f"[DEMO] Skipping blog creation due to: {e}\n")
+#         for blog_data in FAKE_BLOGS:
+#             try:
+#                 blog_id = db.create(blog_data)
+#                 created_ids.append(blog_id)
+#             except Exception as e:
+#                 print(f"[DEMO] Skipping blog creation due to: {e}\n")
         
-        # ==================== READ ALL OPERATIONS ====================
-        print("\n" + "-"*70)
-        print("2. READ ALL OPERATIONS - Fetching all blog posts")
-        print("-"*70 + "\n")
+#         # ==================== READ ALL OPERATIONS ====================
+#         print("\n" + "-"*70)
+#         print("2. READ ALL OPERATIONS - Fetching all blog posts")
+#         print("-"*70 + "\n")
         
-        try:
-            all_blogs = db.readAll()
-            print(f"\n[DEMO] Total blogs in database: {len(all_blogs)}")
-            for blog_id, blog_data in list(all_blogs.items())[:3]:  # Show first 3
-                print(f"  • {blog_data.get('title')} (ID: {blog_id})")
-        except Exception as e:
-            print(f"[DEMO] Error reading all blogs: {e}")
+#         try:
+#             all_blogs = db.readAll()
+#             print(f"\n[DEMO] Total blogs in database: {len(all_blogs)}")
+#             for blog_id, blog_data in list(all_blogs.items())[:3]:  # Show first 3
+#                 print(f"  • {blog_data.get('title')} (ID: {blog_id})")
+#         except Exception as e:
+#             print(f"[DEMO] Error reading all blogs: {e}")
         
-        # ==================== READ ONE OPERATIONS ====================
-        print("\n" + "-"*70)
-        print("3. READ ONE OPERATIONS - Fetching specific blog post")
-        print("-"*70 + "\n")
+#         # ==================== READ ONE OPERATIONS ====================
+#         print("\n" + "-"*70)
+#         print("3. READ ONE OPERATIONS - Fetching specific blog post")
+#         print("-"*70 + "\n")
         
-        if created_ids:
-            try:
-                blog_data = db.readOne(created_ids[0])
-                print(f"\n[DEMO] Blog Details:")
-                print(f"  Title: {blog_data.get('title')}")
-                print(f"  Content: {blog_data.get('content')[:100]}...")
-                print(f"  Date Created: {blog_data.get('date_created')}")
-                print(f"  Author: {blog_data.get('author')}")
-            except Exception as e:
-                print(f"[DEMO] Error reading blog: {e}")
+#         if created_ids:
+#             try:
+#                 blog_data = db.readOne(created_ids[0])
+#                 print(f"\n[DEMO] Blog Details:")
+#                 print(f"  Title: {blog_data.get('title')}")
+#                 print(f"  Content: {blog_data.get('content')[:100]}...")
+#                 print(f"  Date Created: {blog_data.get('date_created')}")
+#                 print(f"  Author: {blog_data.get('author')}")
+#             except Exception as e:
+#                 print(f"[DEMO] Error reading blog: {e}")
         
-        # ==================== EDIT OPERATIONS ====================
-        print("\n" + "-"*70)
-        print("4. EDIT OPERATIONS - Updating a blog post")
-        print("-"*70 + "\n")
+#         # ==================== EDIT OPERATIONS ====================
+#         print("\n" + "-"*70)
+#         print("4. EDIT OPERATIONS - Updating a blog post")
+#         print("-"*70 + "\n")
         
-        if created_ids:
-            try:
-                update_data = {
-                    "title": "Updated: Getting Started with Python (Advanced)",
-                    "content": "Updated content with more advanced topics...",
-                    "date_created": "06-04-2026"
-                }
-                db.edit(created_ids[0], update_data)
+#         if created_ids:
+#             try:
+#                 update_data = {
+#                     "title": "Updated: Getting Started with Python (Advanced)",
+#                     "content": "Updated content with more advanced topics...",
+#                     "date_created": "06-04-2026"
+#                 }
+#                 db.edit(created_ids[0], update_data)
                 
-                # Verify the edit
-                updated_blog = db.readOne(created_ids[0])
-                print(f"\n[DEMO] Updated Blog:")
-                print(f"  New Title: {updated_blog.get('title')}")
-                print(f"  New Date: {updated_blog.get('date_created')}")
-            except Exception as e:
-                print(f"[DEMO] Error editing blog: {e}")
+#                 # Verify the edit
+#                 updated_blog = db.readOne(created_ids[0])
+#                 print(f"\n[DEMO] Updated Blog:")
+#                 print(f"  New Title: {updated_blog.get('title')}")
+#                 print(f"  New Date: {updated_blog.get('date_created')}")
+#             except Exception as e:
+#                 print(f"[DEMO] Error editing blog: {e}")
         
-        # ==================== DELETE OPERATIONS ====================
-        print("\n" + "-"*70)
-        print("5. DELETE OPERATIONS - Removing a blog post")
-        print("-"*70 + "\n")
+#         # ==================== DELETE OPERATIONS ====================
+#         print("\n" + "-"*70)
+#         print("5. DELETE OPERATIONS - Removing a blog post")
+#         print("-"*70 + "\n")
         
-        if len(created_ids) > 1:
-            try:
-                db.delete(created_ids[-1])
-                print(f"\n[DEMO] Blog post deleted from database")
-            except Exception as e:
-                print(f"[DEMO] Error deleting blog: {e}")
+#         if len(created_ids) > 1:
+#             try:
+#                 db.delete(created_ids[-1])
+#                 print(f"\n[DEMO] Blog post deleted from database")
+#             except Exception as e:
+#                 print(f"[DEMO] Error deleting blog: {e}")
         
-        # ==================== FINAL STATUS ====================
-        print("\n" + "-"*70)
-        print("6. FINAL STATUS - Verification")
-        print("-"*70 + "\n")
+#         # ==================== FINAL STATUS ====================
+#         print("\n" + "-"*70)
+#         print("6. FINAL STATUS - Verification")
+#         print("-"*70 + "\n")
         
-        try:
-            final_blogs = db.readAll()
-            print(f"\n[DEMO] ✓ Final blog count in database: {len(final_blogs)}")
-        except Exception as e:
-            print(f"[DEMO] Error verifying final state: {e}")
+#         try:
+#             final_blogs = db.readAll()
+#             print(f"\n[DEMO] ✓ Final blog count in database: {len(final_blogs)}")
+#         except Exception as e:
+#             print(f"[DEMO] Error verifying final state: {e}")
         
-    except Exception as e:
-        print(f"\n[FATAL ERROR] Unexpected error in demo: {e}")
+#     except Exception as e:
+#         print(f"\n[FATAL ERROR] Unexpected error in demo: {e}")
     
-    print("\n" + "="*70)
-    print("DEMO COMPLETED")
-    print("="*70 + "\n")
+#     print("\n" + "="*70)
+#     print("DEMO COMPLETED")
+#     print("="*70 + "\n")
     
