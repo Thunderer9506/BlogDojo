@@ -6,12 +6,7 @@
                 <div class="postInfo">
                     <h3>{{post.title | title}}</h3>
                     <div class="userDetails">
-                        {% for user in users %}
-                            {% if post.userId == user.userId %}
-                                <img class="pfp" src="{{user.profile_pic}}" alt="{{user.name}}">
-                                <p>{{user.username}} . {{post.date | sliceDate}}</p>
-                            {% endif %}
-                        {% endfor %}
+                        <p>{{post.date | sliceDate}}</p>
                     </div>
                 </div>
                 <a class="postLink" href="{{url_for('viewPost',blogId=post.blogId)}}">
