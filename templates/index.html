@@ -10,9 +10,9 @@
 
     <nav class="navbar">
         <div class="navItem">
-            <a href="{{url_for('insert',userId = userId)}}">{{navButton.navButton('','fa-solid fa-pen','')}}</a>
-            
-            <a href="{{url_for('profile',userId = userId)}}">{{navButton.navButton('','fa-solid fa-user','')}}</a>
+            {% if is_admin %}
+                <a href="{{url_for('insert')}}">{{navButton.navButton('','fa-solid fa-pen','')}}</a>
+            {% endif %}
             {{navButton.navButton('mode','modeIcon fa-regular fa-sun','changeMode()')}}
         </div>
     </nav>
@@ -20,7 +20,7 @@
     <div class="container">
         <div class="containerWidth">
             <h1 class="heading">BLOGDOJO</h1>
-            {{blogCard.blogCard(posts,users)}}
+            {{blogCard.blogCard(posts, [])}}
         </div>
     </div>
     

@@ -8,7 +8,7 @@
 {% block content %}
     <div style="position:relative;">
         <div style="position:absolute; top:1rem; left:1rem;">
-            <a href="{{url_for('home',userId = userId)}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
+            <a href="{{url_for('home')}}">{{navButton.navButton('','fa-solid fa-arrow-left','')}}</a>
         </div>
     </div>
     <div style="position:relative;">
@@ -18,7 +18,10 @@
     </div>
 
     <div class="container">
-        <form enctype="multipart/form-data" action="{{url_for('insert',userId=userId)}}" class="insertForm" method="POST">
+        <form enctype="multipart/form-data" action="{{url_for('insert')}}" class="insertForm" method="POST">
+            {% if error %}
+                <p class="loginError">{{ error }}</p>
+            {% endif %}
             <div class="inputLabelWraper">
                 <label class="insertLabel" for="image">Image:</label>
                 <input class="insertImage" type="file" name="image">
@@ -40,9 +43,31 @@
     </div>
 
     <script>
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+            ['blockquote', 'code-block'],
+
+            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+            [{ 'direction': 'rtl' }],                         // text direction
+
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+
+            ['clean']                                         // remove formatting button
+        ];
         var quill = new Quill('#editor', {
             theme: 'snow',
-            placeholder:'Write you Blog here...'
+            placeholder:'Write you Blog here...',
+            modules: {
+                toolbar: toolbarOptions
+            },
         });
 
         // On form submit, move HTML into hidden input

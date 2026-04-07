@@ -1,12 +1,13 @@
 .container{
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 5rem 1rem 2rem;
 }
 
 .insertForm{
-    width: 70%;
+    width: min(100%, 900px);
     font-family: Raleway;
 }
 
@@ -17,13 +18,13 @@
 
 .insertLabel{
     font-size: 1.5rem;
-    
+    display: block;
     margin-bottom: 10px;
 }
 
 .insertInput{
-    margin-left: 1rem;
-    display: inline-block;
+    margin-left: 0;
+    display: block;
     padding:5px;
     font-family: Mulish;
     border-radius: 5px;
@@ -32,7 +33,7 @@
     color: #f4f4f5;
     background-color: transparent;
     outline: 0;
-    width: 80%;
+    width: 100%;
     font-size: 17px;
     font-weight: 100;
 }
@@ -73,7 +74,7 @@
 
 .insertButton{
     padding: 6px 0px;
-    width: 10rem;
+    width: min(100%, 12rem);
     border: none;
     border-radius: 10px;
     background-color: #2B7FFF;
@@ -90,11 +91,23 @@
 
 @media (max-width:640px) {
     .insertForm{
-        margin-top: 8rem;
-        width: 90%;
+        margin-top: 0;
+        width: 100%;
     }
 
     .insertInput{
-        width: 50%;
+        width: 100%;
+    }
+
+    .insertLabel {
+        font-size: 1.2rem;
+    }
+
+    #editor {
+        height: 16rem !important;
+    }
+
+    .insertButton {
+        width: 100%;
     }
 }
