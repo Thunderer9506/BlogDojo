@@ -1,164 +1,216 @@
 from flask import *
-from sqlalchemy.exc import *
-from werkzeug.security import generate_password_hash, check_password_hash
-
-from db import db
-from models.user import User
-from models.post import Post
-from utils import pfp
+from werkzeug.security import check_password_hash
+from db.storage import Database
 from functools import wraps
-
-import uuid
 from dotenv import load_dotenv
+from datetime import datetime
+from typing import Any, Dict, List
 import os
+import tempfile
+
+load_dotenv()
 
 app = Flask(__name__)
-load_dotenv()
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv("SQLALCHEMY_TRACK_MODIFICATIONS")
-
 app.secret_key = os.getenv('SECRET_KEY')
-db.init_app(app)
 
-def login_required(f):
+db = Database()
+
+
+def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
+        if not session.get('is_admin'):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
 
-@app.route('/')
-@login_required
-def initialRoute():
-    return redirect(url_for('login',userId = session['user_id']))
+def get_admin_credentials() -> Dict[str, Any]:
+    """Fetch admin credentials from Firestore doc id 'credentials'."""
+    try:
+        return db.readOne('credentials')
+    except Exception as e:
+        print(f"[AUTH] Could not read admin credentials: {e}")
+        return {}
 
-@app.route("/signup", methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        try:
-            name = request.form.get('name')
-            username = request.form.get('username')
-            email = request.form.get('email')
-            password = request.form.get('password')
-            hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
-            userId = str(uuid.uuid4())
-            user = User(userId=userId,name=name, username=username, email=email, password=hashed_password,
-                        profile_pic=pfp.generate_random_pfp(userId))
-            db.session.add(user)
-            db.session.commit()
-            session['user_id'] = user.userId
-            session['user_email'] = user.email
-            session['user_password'] = user.password
-            return redirect(url_for('home',userId=session['user_id']))  
-        except IntegrityError as e:
-            print(e)
-            db.session.rollback()
-    return render_template('signup.html')
+
+def normalize_posts(posts_map: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Convert Firestore map response into template-ready post list."""
+    posts: List[Dict[str, Any]] = []
+    for blog_id, data in posts_map.items():
+        if blog_id == 'credentials':
+            continue
+
+        post_data = dict(data)
+        post_data['blogId'] = blog_id
+        if 'date' not in post_data and 'date_created' in post_data:
+            post_data['date'] = post_data['date_created']
+        posts.append(post_data)
+
+    posts.sort(key=lambda x: x.get('date_created', ''), reverse=True)
+    return posts
+
+
+@app.context_processor
+def inject_auth_state() -> Dict[str, bool]:
+    return {'is_admin': bool(session.get('is_admin', False))}
+
+
+@app.route('/')
+def initialRoute():
+    return redirect(url_for('home'))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if 'user_id' in session:
-        return redirect(url_for('home',userId = session['user_id']))
+    if session.get('is_admin'):
+        return redirect(url_for('home'))
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
 
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.userId
-            session['user_email'] = user.email
-            return redirect(url_for('home', userId=session['user_id']))
-        else:
-            return render_template('login.html', error='Credentials are invalid')
+        user = get_admin_credentials()
+        stored_email = user.get('email')
+        stored_password = user.get('password')
+        if user and email == stored_email and stored_password and password == stored_password:
+            session['is_admin'] = True
+            return redirect(url_for('home'))
+        return render_template('login.html', error='Credentials are invalid')
     
     return render_template('login.html')
 
 
+@app.route('/logout')
+def logout():
+    session.pop('is_admin', None)
+    return redirect(url_for('home'))
 
-@app.route('/<string:userId>/')
-@login_required
-def home(userId):
-    post = Post.query.all()
-    user = User.query.all()
-    return render_template('index.html',posts=post,users=user,userId=session['user_id'])
 
-@app.route('/image/<string:post_id>')
-@login_required
-def get_post_image(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.image_data:
-        return Response(post.image_data, mimetype=post.image_mime)
-    else:
-        return "No image", 404
+@app.route('/signup')
+def signup():
+    # Only one admin account is supported in this application.
+    return render_template('login.html', error='Sign up is disabled. Please contact admin.')
+
+
+@app.route('/home')
+def home():
+    posts_map = db.readAll()
+    posts = normalize_posts(posts_map)
+    return render_template(
+        'index.html',
+        posts=posts,
+    )
     
-
-@app.route('/insert/<string:userId>',methods=['GET','POST'])
-@login_required
-def insert(userId):
+@app.route('/insert',methods=['GET','POST'])
+@admin_required
+def insert():
     if request.method == 'POST':
-        image = request.files['image']
-        image_data = image.read()            
-        image_mime = image.content_type      
         title = request.form.get('title')
         content = request.form.get('content')
-        postId = str(uuid.uuid4())
-        post = Post(blogId = postId,title=title,content=content,userId = session['user_id'],image_data=image_data,
-                    image_mime=image_mime)
-        db.session.add(post)    
-        db.session.commit()
-        return redirect(url_for('home',userId=session['user_id']))
-    return render_template('newPost.html',userId=session['user_id'])
 
-@app.route('/user/<string:userId>')
-@login_required
-def profile(userId):
-    user = User.query.filter_by(userId = userId).first()
-    post = Post.query.filter_by(userId = userId).all()
+        if not title or not content:
+            return render_template('newPost.html', error='Title and content are required')
 
-    return render_template('profile.html',user=[user],posts=post,userId=session['user_id'])
+        post_data = {
+            'title': title,
+            'content': content,
+            'date_created': datetime.now().strftime('%d-%m-%Y'),
+        }
+
+        image = request.files.get('image')
+
+        try:
+
+            db.create(post_data, image_data=image.read())
+            return redirect(url_for('home'))
+        except Exception as e:
+            print(f"[ERROR] Failed to create blog post: {e}")
+
+    return render_template('newPost.html')
 
 @app.route('/post/<string:blogId>')
-@login_required
 def viewPost(blogId):
-    post = Post.query.filter_by(blogId=blogId).first()
-    user = User.query.filter_by(userId=post.userId).first()
-    return render_template('post.html',post = post,user = user,currentUser = session['user_id'])
+    try:
+        post = db.readOne(blogId)
+    except ValueError:
+        abort(404)
+
+    post['blogId'] = blogId
+    if 'date' not in post and 'date_created' in post:
+        post['date'] = post['date_created']
+
+    return render_template('post.html', post=post)
+
+
+@app.route('/post-image/<string:post_id>')
+def get_post_image(post_id):
+    try:
+        post = db.readOne(post_id)
+    except Exception:
+        abort(404)
+
+    image_url = post.get('image_url')
+    if image_url:
+        return redirect(image_url)
+
+    return redirect(url_for('static', filename='assets/demo.png'))
 
 @app.route('/delete/<string:blogId>')
-@login_required
+@admin_required
 def deletePost(blogId):
-    post = Post.query.filter_by(blogId=blogId).first()
-    user = User.query.filter_by(userId=session['user_id']).first()
-    db.session.delete(post)
-    db.session.commit()
-
-    return redirect(url_for('profile',userId=session['user_id']))
+    db.delete(blogId)
+    return redirect(url_for('home'))
 
 @app.route('/edit/<string:blogId>',methods=['GET','POST'])
-@login_required
+@admin_required
 def editPost(blogId):
-    post = Post.query.filter_by(blogId=blogId).first()
+    try:
+        post = db.readOne(blogId)
+    except ValueError:
+        abort(404)
+
+    post['blogId'] = blogId
+
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
-        post.title = title
-        post.content = content
-        db.session.commit()
-        return redirect(url_for('profile',userId=session['user_id']))
+        update_data: Dict[str, Any] = {}
+
+        if title:
+            update_data['title'] = title
+        if content:
+            update_data['content'] = content
+
+        image = request.files.get('image')
+        temp_file_path = None
+
+        try:
+            if image and image.filename:
+                suffix = os.path.splitext(image.filename)[1] or '.jpg'
+                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                    image.save(tmp)
+                    temp_file_path = tmp.name
+
+                image_url = db.image_storage.upload_blog_image(temp_file_path, blogId)
+                update_data['image_url'] = image_url
+
+            if update_data:
+                db.edit(blogId, update_data)
+            return redirect(url_for('viewPost', blogId=blogId))
+        finally:
+            if temp_file_path and os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
         
-    return render_template('edit.html',post=post)
+    return render_template('edit.html', post=post)
 
 
 @app.template_filter('sliceDate')
 def slice_date(s):
-    return s.strftime("%d-%m-%Y")
-
-with app.app_context():
-    db.create_all()
+    if hasattr(s, 'strftime'):
+        return s.strftime("%d-%m-%Y")
+    return str(s)
 
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # fallback to 5000 if PORT not set
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)
