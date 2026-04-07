@@ -1,9 +1,56 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from datetime import datetime
 from typing import Dict, Optional, Any
 import os
+
+from dotenv import load_dotenv
+from imagekitio import ImageKit
+
+
+class ImageStorage:
+    """Class for uploading images to ImageKit."""
+
+    def __init__(self) -> None:
+        """Initialize ImageKit client from environment variables."""
+        load_dotenv()
+        self.public_key = os.getenv("IMAGEKIT_PUBLIC_KEY")
+        self.private_key = os.getenv("IMAGEKIT_PRIVATE_KEY")
+        self.url_endpoint = os.getenv("IMAGEKIT_URL_ENDPOINT")
+        self.client: Optional[ImageKit] = None
+
+        if self.public_key and self.private_key and self.url_endpoint:
+            self.client = ImageKit(
+                public_key=self.public_key,
+                private_key=self.private_key,
+                url_endpoint=self.url_endpoint,
+            )
+            print("[IMAGEKIT] ✓ ImageKit initialized successfully")
+        else:
+            print("[IMAGEKIT] ImageKit keys are missing. Image upload is disabled.")
+
+    def upload_blog_image(self, image_path: str, blog_id: str) -> str:
+        """Upload a blog image to ImageKit and return its URL."""
+        if not self.client:
+            raise ValueError("ImageKit client is not initialized")
+
+        if not isinstance(image_path, str) or not image_path.strip():
+            raise ValueError("image_path must be a non-empty string")
+
+        normalized_path = os.path.abspath(image_path)
+        if not os.path.exists(normalized_path):
+            raise FileNotFoundError(f"Image file not found: {normalized_path}")
+
+        print(f"[IMAGEKIT] Uploading image for blog '{blog_id}' from: {normalized_path}")
+        with open(normalized_path, "rb") as image_file:
+            response = self.client.upload_file(
+                file=image_file,
+                file_name=f"blog_{blog_id}",
+            )
+
+        image_url = response.url
+        print(f"[IMAGEKIT] ✓ Image uploaded successfully: {image_url}")
+        return image_url
 
 
 class Database:
@@ -13,11 +60,13 @@ class Database:
         """ Initialize Firebase connection and Firestore client. """
         try:
             print("[DATABASE] Initializing Firebase connection...")
+            self.image_storage = ImageStorage()
 
             # Get the path to the service account key relative to this script
             service_account_path = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
             cred = credentials.Certificate(service_account_path)
-            firebase_admin.initialize_app(cred)
+            if not firebase_admin._apps:
+                firebase_admin.initialize_app(cred)
             self.db = firestore.client()
 
             print("[DATABASE] ✓ Connected to Firestore successfully!")
@@ -67,12 +116,23 @@ class Database:
             print(f"[ERROR] Failed to read blog '{blogId}': {e}")
             raise
     
-    def create(self, data: Dict[str, Any]) -> str:
+    def create(self, data: Dict[str, Any], image_path: Optional[str] = None) -> str:
         """ Create a new blog post in the database. """
         try:
             print(f"[CREATE] Creating new blog post: '{data['title']}'")
             update_time, doc_ref = self.db.collection("Blog").add(data)
             print(f"[CREATE] ✓ Blog post created successfully with ID: {doc_ref.id}")
+
+            if image_path:
+                try:
+                    image_url = self.image_storage.upload_blog_image(image_path=image_path, blog_id=doc_ref.id)
+                    self.edit(doc_ref.id, {"image_url": image_url})
+                    print(f"[CREATE] ✓ Image URL saved to blog '{doc_ref.id}'")
+                except Exception as image_error:
+                    print(f"[CREATE] Image upload failed. Rolling back blog '{doc_ref.id}'")
+                    self.delete(doc_ref.id)
+                    raise RuntimeError(f"Failed to upload image: {image_error}") from image_error
+
             return doc_ref.id
         except ValueError as e:
             print(f"[ERROR] Validation error: {e}")
