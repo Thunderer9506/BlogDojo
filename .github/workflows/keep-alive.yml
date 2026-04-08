@@ -2,7 +2,7 @@ name: Keep Render Alive
 
 on:
   schedule:
-    - cron: '0 */5 * * *'  # Every 5 hours
+    - cron: '*/10 * * * *'  # Runs every 10 minutes
   workflow_dispatch:
 
 jobs:
